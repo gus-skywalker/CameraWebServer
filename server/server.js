@@ -4,8 +4,8 @@ const WebSocket = require('ws');
 const app = express();
 app.use(express.static(__dirname + '/public'));
 
-const WS_PORT  = 8888;
-const HTTP_PORT = 8000;
+const WS_PORT  = 3000;
+const HTTP_PORT = 8080;
 
 const wsServer = new WebSocket.Server({port: WS_PORT}, ()=> console.log(`WS Server is listening at ${WS_PORT}`));
 
@@ -25,5 +25,5 @@ wsServer.on('connection', (ws, req)=>{
     });
 });
 
-app.get('/client',(req,res)=>res.sendFile(path.resolve(__dirname, './client_v2.html')));
+app.get('/client',(req,res)=>res.sendFile(path.resolve(__dirname, './client.html')));
 app.listen(HTTP_PORT, ()=> console.log(`HTTP server listening at ${HTTP_PORT}`));
