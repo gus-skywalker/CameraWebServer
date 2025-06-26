@@ -26,4 +26,4 @@ wsServer.on('connection', (ws, req)=>{
 });
 
 app.get('/client',(req,res)=>res.sendFile(path.resolve(__dirname, './client.html')));
-app.listen(HTTP_PORT, ()=> console.log(`HTTP server listening at ${HTTP_PORT}`));
+app.listen(HTTP_PORT, '0.0.0.0', () => console.log(`HTTP server listening at ${HTTP_PORT}`));
