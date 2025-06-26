@@ -18,15 +18,17 @@
             // const img = document.querySelector('img');
             var canvas = document.getElementById('canvas');
 	        var ctx = canvas.getContext('2d');
+
+
             // const WS_URL = 'ws://esp32cam.local:3000'; // Replace with your WebSocket URL
-            const WS_URL = 'ws://177.26.125.82:3000'; 
+            const WS_URL = 'ws://177.26.125.82:3000';
             const ws = new WebSocket(WS_URL);
             let urlObject;
 
             var img = new Image();
 	        img.onload = function() {
-			canvas.style.width=this.width+'px';
-			canvas.style.height=this.height+'px';
+			canvas.style.width='100vw';
+			canvas.style.height='auto';
 			ctx.drawImage(this, 0, 0, this.width,    this.height,     // source rectangle
                    0, 0, canvas.width, canvas.height); // destination rectangle
 	        }
