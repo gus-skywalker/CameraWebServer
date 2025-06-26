@@ -28,5 +28,11 @@ wsServer.on('connection', (ws, req)=>{
     });
 });
 
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  next();
+});
 app.get('/client',(req,res)=>res.sendFile(path.resolve(__dirname, './client.html')));
 app.listen(HTTP_PORT, '0.0.0.0', () => console.log(`HTTP server listening at ${HTTP_PORT}`));
