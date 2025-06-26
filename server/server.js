@@ -7,7 +7,10 @@ app.use(express.static(__dirname + '/public'));
 const WS_PORT  = 3000;
 const HTTP_PORT = 8080;
 
-const wsServer = new WebSocket.Server({port: WS_PORT}, ()=> console.log(`WS Server is listening at ${WS_PORT}`));
+const wsServer = new WebSocket.Server({ 
+  port: WS_PORT,
+  host: '0.0.0.0'
+}, () => console.log(`WS Server is listening at ${WS_PORT}`));
 
 let connectedClients = [];
 wsServer.on('connection', (ws, req)=>{

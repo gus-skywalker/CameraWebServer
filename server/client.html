@@ -19,7 +19,7 @@
             var canvas = document.getElementById('canvas');
 	        var ctx = canvas.getContext('2d');
             // const WS_URL = 'ws://esp32cam.local:3000'; // Replace with your WebSocket URL
-            const WS_URL = `ws://${window.location.hostname}:3000`;
+            const WS_URL = 'ws://192.168.15.3:3000'; 
             const ws = new WebSocket(WS_URL);
             let urlObject;
 
