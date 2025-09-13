@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebCam Hill Of Joy - Personalizável</title>
+    <style>
+        :root {
+            --primary-color: #4285f4;
+            --bg-color: #f5f5f5;
+            --text-color: #333;
+            --panel-bg: #ffffff;
+            --border-color: #ddd;
+        }
+
+        .dark-mode {
+            --primary-color: #8ab4f8;
+            --bg-color: #121212;
+            --text-color: #f1f1f1;
+            --panel-bg: #1e1e1e;
+            --border-color: #444;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+
+        .main_container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .page_title h1 {
+            margin: 0;
+            color: var(--primary-color);
+        }
+
+        .control_panel {
+            background-color: var(--panel-bg);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border: 1px solid var(--border-color);
+        }
+
+        .control_group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        button, select {
+            padding: 8px 15px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            background-color: var(--panel-bg);
+            color: var(--text-color);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        button:hover, select:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .video_container {
+            position: relative;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        #canvas {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            background-color: #000;
+        }
+
+        .status {
+            margin-top: 10px;
+            font-size: 14px;
+            color: var(--primary-color);
+        }
+
+        .settings-panel {
+            display: none;
+            background-color: var(--panel-bg);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .settings-panel.show {
+            display: block;
+        }
+
+        .setting-item {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        input[type="range"] {
+            width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .control_group {
+                flex-direction: column;
+            }
+            
+            button, select {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body class="page_display">
+    <div class="main_container">
+        <div class="header">
+            <div class="page_title">
+                <h1>WebCam Hill of Joy</h1>
+                <div class="status" id="connectionStatus">Conectando...</div>
+            </div>
+            <div class="control_group">
+                <button id="themeToggle" class="btn-primary">Modo Escuro</button>
+                <button id="settingsToggle">Configurações</button>
+            </div>
+        </div>
+
+        <div class="control_panel">
+            <div class="control_group">
+                <button id="fullscreenBtn" class="btn-primary">Tela Cheia</button>
+                <button id="snapshotBtn">Capturar Foto</button>
+                <select id="streamQuality">
+                    <option value="auto">Qualidade Automática</option>
+                    <option value="high">Alta Qualidade</option>
+                    <option value="medium">Qualidade Média</option>
+                    <option value="low">Baixa Qualidade</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="settings-panel" id="settingsPanel">
+            <div class="setting-item">
+                <label for="brightness">Brilho</label>
+                <input type="range" id="brightness" min="0" max="200" value="100">
+            </div>
+            <div class="setting-item">
+                <label for="contrast">Contraste</label>
+                <input type="range" id="contrast" min="0" max="200" value="100">
+            </div>
+            <div class="setting-item">
+                <label for="customServer">Servidor Personalizado</label>
+                <input type="text" id="customServer" placeholder="ws://endereço:porta" value="ws://177.26.125.82:3000">
+                <button id="saveServerBtn" class="btn-primary" style="margin-top: 5px;">Salvar Servidor</button>
+            </div>
+        </div>
+
+        <div class="video_container">
+            <canvas id="canvas">
+                Sinto muito, mas seu navegador não é compatível com &lt;canvas&gt;.
+            </canvas>
+        </div>
+    </div>
+
+    <script>
+        // Elementos da UI
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const themeToggle = document.getElementById('themeToggle');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        const snapshotBtn = document.getElementById('snapshotBtn');
+        const settingsToggle = document.getElementById('settingsToggle');
+        const settingsPanel = document.getElementById('settingsPanel');
+        const streamQuality = document.getElementById('streamQuality');
+        const connectionStatus = document.getElementById('connectionStatus');
+        const customServer = document.getElementById('customServer');
+        const saveServerBtn = document.getElementById('saveServerBtn');
+        const brightnessControl = document.getElementById('brightness');
+        const contrastControl = document.getElementById('contrast');
+
+        // Configurações do usuário
+        let userSettings = {
+            darkMode: false,
+            serverUrl: 'ws://177.26.125.82:3000',
+            quality: 'auto',
+            brightness: 100,
+            contrast: 100
+        };
+
+        // Carregar configurações salvas
+        function loadSettings() {
+            const savedSettings = localStorage.getItem('webcamSettings');
+            if (savedSettings) {
+                userSettings = JSON.parse(savedSettings);
+                applySettings();
+            }
+        }
+
+        // Salvar configurações
+        function saveSettings() {
+            localStorage.setItem('webcamSettings', JSON.stringify(userSettings));
+        }
+
+        // Aplicar configurações
+        function applySettings() {
+            // Tema
+            if (userSettings.darkMode) {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = 'Modo Claro';
+            } else {
+                document.body.classList.remove('dark-mode');
+                themeToggle.textContent = 'Modo Escuro';
+            }
+            
+            // Qualidade
+            streamQuality.value = userSettings.quality;
+            
+            // Servidor
+            customServer.value = userSettings.serverUrl;
+            
+            // Efeitos de imagem
+            brightnessControl.value = userSettings.brightness;
+            contrastControl.value = userSettings.contrast;
+            applyImageFilters();
+        }
+
+        // Aplicar filtros de imagem
+        function applyImageFilters() {
+            canvas.style.filter = `brightness(${userSettings.brightness}%) contrast(${userSettings.contrast}%)`;
+        }
+
+        // Inicialização
+        loadSettings();
+
+        // WebSocket Connection
+        let ws;
+        let urlObject;
+        let reconnectAttempts = 0;
+        const maxReconnectAttempts = 5;
+        const reconnectDelay = 3000; // 3 segundos
+
+        function connectWebSocket() {
+            ws = new WebSocket(userSettings.serverUrl);
+
+            ws.onopen = () => {
+                console.log(`Connected to ${userSettings.serverUrl}`);
+                connectionStatus.textContent = 'Conectado';
+                connectionStatus.style.color = 'green';
+                reconnectAttempts = 0;
+            };
+
+            ws.onmessage = message => {
+                const arrayBuffer = message.data;
+                if(urlObject){
+                    URL.revokeObjectURL(urlObject);
+                }
+                urlObject = URL.createObjectURL(new Blob([arrayBuffer]));
+                img.src = urlObject;
+            };
+
+            ws.onclose = () => {
+                console.log('Connection closed');
+                connectionStatus.textContent = 'Desconectado - Tentando reconectar...';
+                connectionStatus.style.color = 'red';
+                
+                if (reconnectAttempts < maxReconnectAttempts) {
+                    reconnectAttempts++;
+                    setTimeout(connectWebSocket, reconnectDelay);
+                }
+            };
+
+            ws.onerror = (error) => {
+                console.error('WebSocket error:', error);
+                connectionStatus.textContent = 'Erro de conexão';
+                connectionStatus.style.color = 'red';
+            };
+        }
+
+        // Image handling
+        const img = new Image();
+        img.onload = function() {
+            // Ajusta o tamanho do canvas para manter a proporção da imagem
+            const aspectRatio = this.width / this.height;
+            const maxWidth = window.innerWidth * 0.9;
+            const maxHeight = window.innerHeight * 0.7;
+            
+            let width = maxWidth;
+            let height = width / aspectRatio;
+            
+            if (height > maxHeight) {
+                height = maxHeight;
+                width = height * aspectRatio;
+            }
+            
+            canvas.width = width;
+            canvas.height = height;
+            
+            ctx.drawImage(this, 0, 0, this.width, this.height, 0, 0, width, height);
+        };
+
+        // Event Listeners
+        themeToggle.addEventListener('click', () => {
+            userSettings.darkMode = !userSettings.darkMode;
+            document.body.classList.toggle('dark-mode', userSettings.darkMode);
+            themeToggle.textContent = userSettings.darkMode ? 'Modo Claro' : 'Modo Escuro';
+            saveSettings();
+        });
+
+        fullscreenBtn.addEventListener('click', () => {
+            if (canvas.requestFullscreen) {
+                canvas.requestFullscreen();
+            } else if (canvas.webkitRequestFullscreen) {
+                canvas.webkitRequestFullscreen();
+            } else if (canvas.msRequestFullscreen) {
+                canvas.msRequestFullscreen();
+            }
+        });
+
+        snapshotBtn.addEventListener('click', () => {
+            const link = document.createElement('a');
+            link.download = 'webcam-snapshot-' + new Date().toISOString() + '.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        });
+
+        settingsToggle.addEventListener('click', () => {
+            settingsPanel.classList.toggle('show');
+        });
+
+        streamQuality.addEventListener('change', () => {
+            userSettings.quality = streamQuality.value;
+            saveSettings();
+            // Aqui você pode implementar a lógica para ajustar a qualidade do stream
+            console.log('Qualidade alterada para:', userSettings.quality);
+        });
+
+        saveServerBtn.addEventListener('click', () => {
+            const newServer = customServer.value.trim();
+            if (newServer && newServer !== userSettings.serverUrl) {
+                userSettings.serverUrl = newServer;
+                saveSettings();
+                connectWebSocket(); // Reconectar com o novo servidor
+            }
+        });
+
+        brightnessControl.addEventListener('input', () => {
+            userSettings.brightness = brightnessControl.value;
+            applyImageFilters();
+            saveSettings();
+        });
+
+        contrastControl.addEventListener('input', () => {
+            userSettings.contrast = contrastControl.value;
+            applyImageFilters();
+            saveSettings();
+        });
+
+        // Iniciar conexão WebSocket
+        connectWebSocket();
+
+        // Lidar com redimensionamento da janela
+        window.addEventListener('resize', () => {
+            // Redesenha a imagem quando a janela é redimensionada
+            if (img.src) {
+                img.onload();
+            }
+        });
+    </script>
+</body>
+</html>
