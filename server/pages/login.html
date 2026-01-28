@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Serviços Internos</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(120deg, #232526 0%, #0f2027 100%);
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+        .login-box {
+            background: #181c20;
+            padding: 40px 32px 32px 32px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(34,40,39,0.25);
+            min-width: 320px;
+            max-width: 360px;
+            width: 100%;
+            text-align: center;
+            border: 1px solid #2e7d32;
+        }
+        .login-box h2 {
+            margin-bottom: 24px;
+            color: #2e7d32;
+            font-size: 2rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        .login-box input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 18px;
+            border: 1px solid #37474f;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: #232526;
+            color: #cfd8dc;
+            transition: border-color 0.2s;
+        }
+        .login-box input:focus {
+            border-color: #2e7d32;
+            outline: none;
+        }
+        .login-box button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(90deg, #2e7d32 0%, #388e3c 100%);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(46,125,50,0.10);
+            transition: background 0.2s;
+        }
+        .login-box button:hover {
+            background: linear-gradient(90deg, #1b5e20 0%, #2e7d32 100%);
+        }
+        .error {
+            color: #e53935;
+            background: #ffebee;
+            border-radius: 6px;
+            padding: 8px;
+            margin-bottom: 10px;
+            display: none;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <h2>Login</h2>
+        <form method="POST" action="/login" autocomplete="off">
+            <input type="text" name="username" id="username" placeholder="Usuário" required maxlength="64" autocomplete="off">
+            <input type="password" name="password" id="password" placeholder="Senha" required maxlength="128" autocomplete="off">
+            <button type="submit">Entrar</button>
+        </form>
+        <div class="error" id="error" style="display:none;color:red;"></div>
+    </div>
+    <script>
+        // Exibe erro se veio de resposta 401
+        if (window.location.search.includes('error=1')) {
+            document.getElementById('error').textContent = 'Senha incorreta!';
+            document.getElementById('error').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
